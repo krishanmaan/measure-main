@@ -63,9 +63,9 @@ const MapComponent: React.FC<MapComponentProps> = ({ onAreaUpdate }) => {
 
   // Create a ref to store the DistanceOverlay class
   const DistanceOverlayRef = useRef<any>(null);
-  
-  // Add state to show the "Create New Field" button after completing a field
-  const [showNewFieldButton, setShowNewFieldButton] = useState(false);
+
+  // New ref to track if we're ready for another field creation
+  const readyForNewField = useRef<boolean>(true);
 
   // Map event handlers
   const onLoad = useCallback((map: google.maps.Map) => {
@@ -268,7 +268,11 @@ const MapComponent: React.FC<MapComponentProps> = ({ onAreaUpdate }) => {
         break;
       case 'field':
         // Enable our custom drawing mode instead of using DrawingManager
-        setIsDrawingMode(true);
+        // Only start drawing if we're ready for a new field
+        if (readyForNewField.current) {
+          setIsDrawingMode(true);
+          readyForNewField.current = false;
+        }
         break;
       case 'distance':
         // Handle distance measurement
@@ -319,8 +323,8 @@ const MapComponent: React.FC<MapComponentProps> = ({ onAreaUpdate }) => {
     // Disable drawing mode after polygon is complete
     setIsDrawingMode(false);
     
-    // Show the create new field button
-    setShowNewFieldButton(true);
+    // Set ready for new field to true to allow creating another field
+    readyForNewField.current = true;
     
     // Create draggable vertex markers for the completed polygon
     const path = polygon.getPath();
@@ -446,12 +450,6 @@ const MapComponent: React.FC<MapComponentProps> = ({ onAreaUpdate }) => {
     
     // Rest of your polygon click listener code...
   }, [map]);
-
-  // Add function to start a new field
-  const handleStartNewField = useCallback(() => {
-    setShowNewFieldButton(false);
-    setIsDrawingMode(true);
-  }, []);
 
   // Add a new function to handle auto-closing polygon
   const setupAutoClosePolygon = useCallback(() => {
@@ -1130,8 +1128,6 @@ const MapComponent: React.FC<MapComponentProps> = ({ onAreaUpdate }) => {
               </>
             )}
             
-            {/* We're not using DrawingManager anymore for our custom implementation */}
-            
             {/* Display existing field polygons */}
             {fieldPolygons.map((polygon, index) => (
               <Polygon
@@ -1170,26 +1166,11 @@ const MapComponent: React.FC<MapComponentProps> = ({ onAreaUpdate }) => {
           isLocating={isLocating}
         />
 
-        {/* Show Create Menu or New Field Button */}
-        {showNewFieldButton ? (
-          <div className="absolute bottom-24 right-4 z-10">
-            <button 
-              onClick={handleStartNewField}
-              className="bg-green-600 hover:bg-green-700 text-white p-3 rounded-full shadow-lg flex items-center justify-center"
-              style={{ width: '50px', height: '50px' }}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-            </button>
-          </div>
-        ) : (
-          <CreateMenu
-            showMenu={showCreateMenu}
-            onToggleMenu={() => setShowCreateMenu(!showCreateMenu)}
-            onOptionSelect={handleCreateOption}
-          />
-        )}
+        <CreateMenu
+          showMenu={showCreateMenu}
+          onToggleMenu={() => setShowCreateMenu(!showCreateMenu)}
+          onOptionSelect={handleCreateOption}
+        />
 
         <ZoomControls
           onZoomIn={handleZoomIn}
