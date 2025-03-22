@@ -1,13 +1,8 @@
 'use client';
 
+import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faDownload,
-  faDrawPolygon,
-  faRuler,
-  faMapMarker,
-  faPlus
-} from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faFileImport, faDrawPolygon, faRuler, faMapMarker } from '@fortawesome/free-solid-svg-icons';
 
 interface CreateMenuProps {
   showMenu: boolean;
@@ -15,51 +10,59 @@ interface CreateMenuProps {
   onOptionSelect: (option: 'import' | 'field' | 'distance' | 'marker') => void;
 }
 
-const CreateMenu = ({ showMenu, onToggleMenu, onOptionSelect }: CreateMenuProps) => {
-  return (
-    <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
-      <div className="relative">
-        {showMenu && (
-          <div className="absolute bottom-full left-0 mb-3 bg-black bg-opacity-75 rounded-lg overflow-hidden w-48">
-            <button 
-              onClick={() => onOptionSelect('import')}
-              className="w-full text-white p-3 flex items-center gap-3 hover:bg-gray-800 transition-colors"
-            >
-              <FontAwesomeIcon icon={faDownload} className="h-5 w-5" />
-              <span>Import</span>
-            </button>
-            <button 
-              onClick={() => onOptionSelect('field')}
-              className="w-full text-white p-3 flex items-center gap-3 hover:bg-gray-800 transition-colors"
-            >
-              <FontAwesomeIcon icon={faDrawPolygon} className="h-5 w-5" />
-              <span>Field</span>
-            </button>
-            <button 
-              onClick={() => onOptionSelect('distance')}
-              className="w-full text-white p-3 flex items-center gap-3 hover:bg-gray-800 transition-colors"
-            >
-              <FontAwesomeIcon icon={faRuler} className="h-5 w-5" />
-              <span>Distance</span>
-            </button>
-            <button 
-              onClick={() => onOptionSelect('marker')}
-              className="w-full text-white p-3 flex items-center gap-3 hover:bg-gray-800 transition-colors"
-            >
-              <FontAwesomeIcon icon={faMapMarker} className="h-5 w-5" />
-              <span>Marker</span>
-            </button>
-          </div>
-        )}
+const CreateMenu: React.FC<CreateMenuProps> = ({
+  showMenu,
+  onToggleMenu,
+  onOptionSelect
+}) => {
+  const handleOptionClick = (option: 'import' | 'field' | 'distance' | 'marker') => {
+    onOptionSelect(option);
+    onToggleMenu(); // Close the menu after selection
+  };
 
-        <button 
-          onClick={onToggleMenu}
-          className="bg-black bg-opacity-60 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-opacity-80 transition-colors"
-        >
-          <FontAwesomeIcon icon={faPlus} className="h-5 w-5" />
-          <span>Create new</span>
-        </button>
-      </div>
+  return (
+    <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
+      {showMenu && (
+        <div className="bg-white rounded-lg shadow-lg mb-2 overflow-hidden animate-slideUp">
+          <button
+            className="flex items-center px-4 py-3 hover:bg-gray-100 w-full transition-colors text-left"
+            onClick={() => handleOptionClick('import')}
+          >
+            <FontAwesomeIcon icon={faFileImport} className="mr-3 text-gray-600" />
+            <span>Import KML/GeoJSON</span>
+          </button>
+          <button
+            className="flex items-center px-4 py-3 hover:bg-gray-100 w-full transition-colors text-left"
+            onClick={() => handleOptionClick('field')}
+          >
+            <FontAwesomeIcon icon={faDrawPolygon} className="mr-3 text-green-600" />
+            <span>Draw New Field</span>
+          </button>
+          <button
+            className="flex items-center px-4 py-3 hover:bg-gray-100 w-full transition-colors text-left"
+            onClick={() => handleOptionClick('distance')}
+          >
+            <FontAwesomeIcon icon={faRuler} className="mr-3 text-blue-600" />
+            <span>Measure Distance</span>
+          </button>
+          <button
+            className="flex items-center px-4 py-3 hover:bg-gray-100 w-full transition-colors text-left"
+            onClick={() => handleOptionClick('marker')}
+          >
+            <FontAwesomeIcon icon={faMapMarker} className="mr-3 text-red-600" />
+            <span>Add Marker</span>
+          </button>
+        </div>
+      )}
+      <button
+        onClick={onToggleMenu}
+        className={`rounded-full shadow-lg p-4 transition-all duration-300 transform ${
+          showMenu ? 'bg-red-500 text-white rotate-45' : 'bg-green-500 text-white'
+        }`}
+        style={{ width: '60px', height: '60px' }}
+      >
+        <FontAwesomeIcon icon={faPlus} className="text-2xl" />
+      </button>
     </div>
   );
 };
