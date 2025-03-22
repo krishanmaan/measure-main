@@ -34,7 +34,6 @@ const CreateMenu: React.FC<CreateMenuProps> = ({
           <button
             className="flex items-center px-4 py-3 hover:bg-gray-100 w-full transition-colors text-left"
             onClick={() => handleOptionClick('field')}
-            data-testid="draw-field-button"
           >
             <FontAwesomeIcon icon={faDrawPolygon} className="mr-3 text-green-600" />
             <span>Draw New Field</span>
